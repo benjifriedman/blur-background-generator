@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Random Circles</title>
+    <style>
+      body {
+        height: 100vh;
+        margin: 0;
+        background-color: #f4f4f4;
+      }
+      body div {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        margin-top: 25px;
+      }
+      canvas {
+        border: 3px solid #000;
+        filter: brightness(1.5);
+        max-width: 90%;
+        max-height: 70%;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <canvas
+        id="myCanvas"
+        style="width: 1200px; height: 800px; filter: brightness(1.5)"
+        width="1200"
+        height="800"
+      ></canvas>
+      <br />
+      <button onclick="drawRandomCircles()" style="margin-top: 15px">
+        Draw Canvas
+      </button>
+      <br />
+      <!-- <button onclick="downloadCanvas()">Download as JPG</button> -->
+      <button onclick="downloadCanvasWithBrightness()">Download as JPG</button>
+    </div>
+
+    <script>
+      const canvas = document.getElementById("myCanvas");
+      const ctx = canvas.getContext("2d");
+      //   var blurAmount = 65;
+      var blurAmount = 45;
+      //   var blurAmount = 15;
+
+      function getRandom(min, max) {
+        return Math.random() * (max - min) + min;
+      }
+
+      function getRandomColor() {
+        // totally random
+        const r = Math.floor(getRandom(0, 255));
+        const g = Math.floor(getRandom(0, 255));
+        const b = Math.floor(getRandom(0, 255));
+        // blue
+        // const r = Math.floor(getRandom(0, 200));
+        // const g = Math.floor(getRandom(30, 200));
+        // const b = Math.floor(getRandom(200, 255));
+
+        // return `rgba(${r},${g},${b},0.9)`;
+        return `rgba(${r},${g},${b},0.6)`;
+      }
+
+      function setRandomBackgroundColor() {
+        ctx.fillStyle = getRandomColor();
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+
+      function drawRandomCircles() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+
+        // ctx.fillStyle = "white";
+        // ctx.fillRect(0, 0, canvas.width, canvas.height);
+        setRandomBackgroundColor();
+
+        const circles = Math.floor(getRandom(10, 25)); // Get random number of circles
+
+        for (let i = 0; i < circles; i++) {
+          const x = getRandom(0, canvas.width);
+          const y = getRandom(0, canvas.height);
+          const radius = getRandom(50, 450);
+          //   const radius = getRandom(20, 190);
+          //   const radius = getRandom(10, 80);
+          const color = getRandomColor();
+          const ellipseX = getRandom(radius, radius * 2); // Random dimension for x-axis
+          const ellipseY = getRandom(radius, radius * 2); // Random dimension for y-axis
+
+          ctx.fillStyle = color;
+          ctx.filter = `blur(${blurAmount}px)`; // Apply blur
+          ctx.beginPath();
+          ctx.ellipse(x, y, ellipseX, ellipseY, 0, 0, 2 * Math.PI); // Drawing ellipse instead of circle for random dimensions
+          ctx.fill();
+        }
+      }
+
+      function downloadCanvas() {
+        const link = document.createElement("a");
+        //link.download = "canvas_image.png";
+        //link.href = canvas.toDataURL("image/png", 1.0); // 1.0 indicates full quality
+        link.download = "canvas_image.jpg";
+        link.href = canvas.toDataURL("image/jpg", 1.0); // 1.0 indicates full quality
+        link.click();
+
+        // Re-draw original canvas content without the brightness adjustment, if needed
+        drawRandomCircles();
+      }
+
+      function downloadCanvasWithBrightness() {
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        applyBrightness(imageData.data, 1.5); // Increase brightness by a factor of 1.5
+        ctx.putImageData(imageData, 0, 0);
+
+        const link = document.createElement("a");
+        link.download = "canvas_image.jpg";
+        link.href = canvas.toDataURL("image/jpeg", 1.0);
+        link.click();
+
+        // Re-draw original canvas content without the brightness adjustment, if needed
+        drawRandomCircles();
+      }
+
+      function applyBrightness(data, factor) {
+        for (let i = 0; i < data.length; i += 4) {
+          data[i] = data[i] * factor; // Red
+          data[i + 1] = data[i + 1] * factor; // Green
+          data[i + 2] = data[i + 2] * factor; // Blue
+        }
+      }
+
+      window.onload = function () {
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        // setRandomBackgroundColor();
+      };
+    </script>
+  </body>
+</html>
