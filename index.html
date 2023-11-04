@@ -19,17 +19,17 @@
       }
       canvas {
         border: 3px solid #000;
+        /* filter: brightness(1.5); */
         filter: brightness(1.5);
         max-width: 90%;
-        max-height: 70%;
       }
     </style>
   </head>
   <body>
-    <div>
+    <div style="height: 100vh; padding-bottom: 120px">
       <canvas
         id="myCanvas"
-        style="width: 1200px; height: 800px; filter: brightness(1.5)"
+        style="width: 1200px; height: 800px; max-height: 60vh"
         width="1200"
         height="800"
       ></canvas>
@@ -45,6 +45,16 @@
     <script>
       const canvas = document.getElementById("myCanvas");
       const ctx = canvas.getContext("2d");
+      const dpr = window.devicePixelRatio || 1;
+      // console.log("dpr: ", dpr);
+
+      // Scale the canvas by the device pixel ratio
+      canvas.width = 1200 * dpr;
+      canvas.height = 800 * dpr;
+      canvas.style.width = "1200px";
+      canvas.style.height = "800px";
+      ctx.scale(dpr, dpr);
+
       //   var blurAmount = 65;
       var blurAmount = 45;
       //   var blurAmount = 15;
@@ -79,12 +89,12 @@
         // ctx.fillRect(0, 0, canvas.width, canvas.height);
         setRandomBackgroundColor();
 
-        const circles = Math.floor(getRandom(10, 25)); // Get random number of circles
+        const circles = Math.floor(getRandom(12, 25)); // Get random number of circles
 
         for (let i = 0; i < circles; i++) {
-          const x = getRandom(0, canvas.width);
-          const y = getRandom(0, canvas.height);
-          const radius = getRandom(50, 450);
+          const x = getRandom(-100, canvas.width);
+          const y = getRandom(-100, canvas.height);
+          const radius = getRandom(50, 350);
           //   const radius = getRandom(20, 190);
           //   const radius = getRandom(10, 80);
           const color = getRandomColor();
@@ -92,10 +102,12 @@
           const ellipseY = getRandom(radius, radius * 2); // Random dimension for y-axis
 
           ctx.fillStyle = color;
-          ctx.filter = `blur(${blurAmount}px)`; // Apply blur
+          //ctx.filter = `blur(${blurAmount}px)`; // Apply blur
+          ctx.filter = "blur(" + 65 * dpr + "px)"; // Apply scaled blur based on device pixel ratio
           ctx.beginPath();
           ctx.ellipse(x, y, ellipseX, ellipseY, 0, 0, 2 * Math.PI); // Drawing ellipse instead of circle for random dimensions
           ctx.fill();
+          ctx.closePath();
         }
       }
 
